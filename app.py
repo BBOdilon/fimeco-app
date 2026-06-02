@@ -39,8 +39,8 @@ try:
     
     # Formulaire d'identification
     with st.form("search_form"):
-        phone_input = st.text_input("Téléphone saisi", placeholder="Ex: 777821507")
-        code_input = st.text_input("Code saisi", placeholder="Ex: FIM-008")
+        phone_input = st.text_input("Téléphone saisi", placeholder="Ex: 77xxxxxxx")
+        code_input = st.text_input("Code saisi", placeholder="Ex: XXXXXXX")
         submit_button = st.form_submit_button("Valider la recherche")
 
     if submit_button:
