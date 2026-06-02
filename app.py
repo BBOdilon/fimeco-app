@@ -11,7 +11,7 @@ st.write("Entrez vos identifiants pour afficher votre situation financière en t
 
 # URL de votre Google Sheet (formaté pour l'export CSV direct)
 # REMPLACEZ 'VOTRE_ID_DE_FEUILLE' par l'ID réel présent dans l'URL de votre Google Sheet
-SHEET_ID = "VOTRE_ID_DE_FEUILLE"
+SHEET_ID = "1yK5U8J-QbLixc4HNBKssbnqIKDkFmzEULqiV6ZxJvts"
 GOOGLE_SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 @st.cache_data(ttl=300)  # Met en cache les données 5 min pour optimiser la vitesse
