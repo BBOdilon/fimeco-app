@@ -1,4 +1,4 @@
-import streamlit as st
+ import streamlit as st
 import pandas as pd
 
 # Configuration de la page mobile-friendly
@@ -9,17 +9,33 @@ st.title("📊 FIMECO 2026")
 st.subheader("Consultation sécurisée des soldes")
 st.write("Entrez vos identifiants pour afficher votre situation financière en temps réel.")
 
-# URL de votre Google Sheet (formaté pour l'export CSV direct)
-# REMPLACEZ 'VOTRE_ID_DE_FEUILLE' par l'ID réel présent dans l'URL de votre Google Sheet
+# ⚠️ REMETTEZ ICI L'IDENTIFIANT DE VOTRE GOOGLE SHEET
 SHEET_ID = "1yK5U8J-QbLixc4HNBKssbnqIKDkFmzEULqiV6ZxJvts"
 GOOGLE_SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
-@st.cache_data(ttl=300)  # Met en cache les données 5 min pour optimiser la vitesse
+@st.cache_data(ttl=60)  # Met à jour les données toutes les minutes
 def load_data():
     return pd.read_csv(GOOGLE_SHEET_URL)
 
+def format_monnaie(valeur):
+    """Formate proprement les montants sans risquer de faire planter l'application"""
+    if pd.isna(valeur):
+        return "0 F CFA"
+    if isinstance(valeur, str):
+        valeur = valeur.strip()
+        if "CFA" in valeur:
+            return valeur
+        return f"{valeur} F CFA"
+    try:
+        return f"{int(valeur):,}".replace(",", " ") + " F CFA"
+    except:
+        return f"{valeur} F CFA"
+
 try:
     df = load_data()
+    
+    # NETTOYAGE : Supprime automatiquement les espaces cachés dans les en-têtes (ex: "Nom ")
+    df.columns = df.columns.str.strip()
     
     # Formulaire d'identification
     with st.form("search_form"):
@@ -29,31 +45,31 @@ try:
 
     if submit_button:
         if phone_input and code_input:
-            # Normalisation des données pour éviter les erreurs de type (String vs Int)
+            # Normalisation des colonnes de recherche
             df['Telephone'] = df['Telephone'].astype(str).str.strip()
-            df['Code'] = df['Code'].astype(str).str.strip()
+            df['Id_Code'] = df['Id_Code'].astype(str).str.strip()
             
-            # Requête de filtrage
-            result = df[(df['Telephone'] == phone_input.strip()) & (df['Code'] == code_input.strip())]
+            # Requête de filtrage avec les vrais noms de votre fichier
+            result = df[(df['Telephone'] == phone_input.strip()) & (df['Id_Code'] == code_input.strip())]
             
             if not result.empty:
                 row = result.iloc[0]
                 
-                # Extraction des variables (ajustez les noms des colonnes selon votre tableau)
+                # Extraction des variables adaptées à votre structure exacte
                 prenom = row['Prenoms']
                 nom = row['Nom']
-                souscrit = row['Montant Souscrit']
-                cotise = row['Montant Cotise']
-                solde = row['Solde']
+                souscrit = format_monnaie(row['Montant Souscrit'])
+                cotise = format_monnaie(row['Montant Cotise'])
+                solde = format_monnaie(row['Solde Restant'])
                 
                 # Affichage des résultats stylisés
                 st.success(f"👋 Bonjour {prenom} {nom} !")
                 
                 st.markdown(f"""
                 ### 📋 Votre bilan FIMECO 2026 :
-                * **Montant souscrit :** {int(souscrit):,} F CFA
-                * **Montant déjà cotisé :** {int(cotise):,} F CFA
-                * **Solde restant à verser :** `{int(solde):,} F CFA`
+                * **Montant souscrit :** {souscrit}
+                * **Montant déjà cotisé :** {cotise}
+                * **Solde restant à verser :** `{solde}`
                 """)
                 
                 st.markdown("---")
@@ -68,7 +84,4 @@ try:
             st.warning("⚠️ Veuillez remplir les deux champs pour lancer la recherche.")
 
 except Exception as e:
-    st.error(f"❌ Une erreur technique est survenue : {e}")
-    if 'df' in locals():
-        st.warning("🔍 Voici les noms exacts des colonnes détectées dans votre fichier :")
-        st.write(list(df.columns))
+    st.error(f"❌ Une erreur est survenue lors du traitement des données : {e}")
