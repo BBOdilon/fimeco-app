@@ -68,4 +68,7 @@ try:
             st.warning("⚠️ Veuillez remplir les deux champs pour lancer la recherche.")
 
 except Exception as e:
-    st.error("Configuration requise : Assurez-vous que votre Google Sheet est partagé en mode 'Tous les utilisateurs disposant du lien peuvent lire'.")
+    st.error(f"❌ Une erreur technique est survenue : {e}")
+    if 'df' in locals():
+        st.warning("🔍 Voici les noms exacts des colonnes détectées dans votre fichier :")
+        st.write(list(df.columns))
