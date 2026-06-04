@@ -162,7 +162,7 @@ try:
                     )
                 
                 st.markdown("---")
-                st.caption("ℹ️ Pour vos prochains versements via Wave ou OM : **787819890** (Précisez votre code)")
+                st.caption("ℹ️ Pour vos prochains versementsvous pouvez procéder par transfert Wave ou Orange Money au 78 781 98 90 (merci de nous envoyer la capture d'écran du reçu), ou opter pour un versement direct chaque deuxième dimanche du mois")
             else:
                 st.error("❌ Aucun membre trouvé avec ce numéro et ce code. Veuillez vérifier vos accès.")
         else:
